@@ -2,8 +2,6 @@
 
 通过入群答案关键词、QQ 等级和退群黑名单审核 QQ 群申请，支持按群设置拒绝理由、跨群共享黑名单，以及大名单文件导出。
 
-当前版本：**2.0.0**。
-
 ## 运行环境
 
 - Python 3.10 或更高版本。
@@ -110,15 +108,6 @@ EXT_PATH=["external_plugins/auto_enter_group"]
 实际数据和缓存位置由宿主的 `localstore_data_dir`、`localstore_cache_dir` 等配置决定。容器部署时，上传文件所用缓存路径需要能被 QQ 协议端访问。
 
 迁移前备份原 `data.json`，并核对新旧 Localstore 路径。保留模块名 `nonebot_plugin_auto_enter_group`。加载时会补齐新增字段，并兼容早期 `keywords` 和 `min_level` 字段；默认关闭等级限制及退群黑名单。
-
-## 测试
-
-```bash
-python -m pip install -r requirements-dev.txt
-python -m pytest
-```
-
-测试使用真实 NoneBot、OneBot 适配器与临时 Localstore 目录，真寻数据库接口由测试替身提供，不连接运行中的机器人。真实宿主、协议端等级字段及群文件上传仍需在对应部署环境验证。
 
 ## 来源与许可
 
