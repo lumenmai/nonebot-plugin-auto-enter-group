@@ -13,30 +13,19 @@
 
 ## 安装
 
-可以直接将插件目录放入真寻的 `zhenxun/plugins/`，安装依赖后重启，**不需要配置 `EXT_PATH`**。
+### 方式一：放入真寻插件目录
 
-下载本仓库后，将其中的 `nonebot_plugin_auto_enter_group/` 文件夹复制到 `zhenxun/plugins/`。复制的是插件文件夹，不是整个仓库，最终结构应为：
+下载本仓库，将其中的 `nonebot_plugin_auto_enter_group/` 目录复制到 `zhenxun/plugins/`。在运行真寻的虚拟环境中安装仓库根目录 `requirements.txt` 中的依赖，然后重启真寻。
 
-```text
-zhenxun/
-└── plugins/
-    └── nonebot_plugin_auto_enter_group/
-        └── __init__.py
+### 方式二：通过外部目录加载
+
+下载本仓库到自选位置，安装 `requirements.txt` 中的依赖。在真寻实际使用的环境配置文件中，将仓库根目录追加到 `EXT_PATH`，例如：
+
+```dotenv
+EXT_PATH=["/path/to/插件仓库"]
 ```
 
-也可以在真寻项目根目录执行以下命令，仓库会克隆到真寻项目的同级目录：
-
-```bash
-git clone https://github.com/lumenmai/nonebot-plugin-auto-enter-group.git ../nonebot-plugin-auto-enter-group
-uv pip install -r ../nonebot-plugin-auto-enter-group/requirements.txt
-cp -R ../nonebot-plugin-auto-enter-group/nonebot_plugin_auto_enter_group zhenxun/plugins/
-```
-
-依赖应安装到运行真寻的虚拟环境中。完成后重启真寻，检查“加群自动审批”是否加载成功。
-
-如果已有同名插件，先备份旧目录，再用新的插件目录替换，保留原有运行数据；同一插件只保留一种加载方式，避免重复加载。
-
-直接安装同名 PyPI 包会获取其发布者上传的版本；使用本仓库时，请下载上面的 GitHub 仓库并复制其中的插件目录。
+保留已有的其他路径，保存配置后重启真寻。每个插件选择一种加载方式。
 
 ## 快速开始
 
