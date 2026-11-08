@@ -1,91 +1,127 @@
-<div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-template/raw/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
-  <br>
-  <p><img src="https://github.com/A-kirami/nonebot-plugin-template/raw/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
-</div>
+# 加群自动审批
 
-<div align="center">
+通过入群答案关键词、QQ 等级和退群黑名单审核 QQ 群申请，支持按群设置拒绝理由、跨群共享黑名单，以及大名单文件导出。
 
-# nonebot-plugin-auto-enter-group
+当前版本：**2.0.0**。
 
-_✨ NoneBot2 加群自动审批 ✨_
+## 运行环境
 
+- Python 3.10 或更高版本。
+- 已安装并能正常运行的[绪山真寻](https://github.com/zhenxun-org/zhenxun_bot)项目。
+- NoneBot2、OneBot V11 适配器，以及 `nonebot-plugin-localstore` 0.7.4 至 0.7.x。
+- QQ 协议端应支持入群审批、陌生人信息查询；机器人需要有相应群管理权限。大名单导出还需要支持上传群文件。
 
-<a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/padoru233/nonebot-plugin-auto-enter-group.svg" alt="license">
-</a>
-<a href="https://pypi.python.org/pypi/nonebot-plugin-auto-enter-group">
-    <img src="https://img.shields.io/pypi/v/nonebot-plugin-auto-enter-group.svg" alt="pypi">
-</a>
-<img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="python">
+插件使用真寻的机器人、群组和插件开关接口。仅在普通 NoneBot 项目中安装 Python 依赖，无法提供这些宿主接口。
 
-</div>
+## 安装
 
-帮助管理员审核入群请求，退群自动记录拒绝入群
+在真寻项目根目录执行：
 
-## 📖 介绍
+```bash
+git clone https://github.com/lumenmai/nonebot-plugin-auto-enter-group.git external_plugins/auto_enter_group
+uv pip install -r external_plugins/auto_enter_group/requirements.txt
+```
 
-在群内播报申请和审核状态，添加关键词后自动进行模糊匹配。  
-可开启退群黑名单，自动拒绝退群的人再次申请。
+在真寻实际使用的环境配置文件中，把仓库目录加入 `EXT_PATH`。若已有其他路径，请保留并追加：
 
-## 💿 安装
+```dotenv
+EXT_PATH=["external_plugins/auto_enter_group"]
+```
 
-<details open>
-<summary>使用 nb-cli 安装</summary>
-在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装
+重启真寻，检查“加群自动审批”是否加载成功。如果 `zhenxun/plugins/` 中已存在同名插件，只保留一种加载方式，避免重复加载。
 
-    nb plugin install nonebot-plugin-auto-enter-group
+也可以只将仓库中的 `nonebot_plugin_auto_enter_group/` 目录放入真寻的 `zhenxun/plugins/`，安装 `requirements.txt` 中的依赖后重启。
 
-</details>
+本仓库的安装地址是上面的 GitHub URL；直接安装同名 PyPI 包会获取其发布者上传的版本。
 
-<details>
-<summary>使用包管理器安装</summary>
-在 nonebot2 项目的插件目录下, 打开命令行, 根据你使用的包管理器, 输入相应的安装命令
+## 快速开始
 
-<details>
-<summary>pip</summary>
+群管理员在群内发送以下命令，即可启用答案匹配：
 
-    pip install nonebot-plugin-auto-enter-group
-</details>
-<details>
-<summary>pdm</summary>
+```text
+添加允许关键词 正确答案
+查看关键词
+```
 
-    pdm add nonebot-plugin-auto-enter-group
-</details>
-<details>
-<summary>poetry</summary>
+允许关键词采用不区分大小写的子串匹配。例如关键词为“正确答案”，验证信息包含“我的答案是正确答案”也会命中。
 
-    poetry add nonebot-plugin-auto-enter-group
-</details>
-<details>
-<summary>conda</summary>
+需要等级门槛时，可以设置：
 
-    conda install nonebot-plugin-auto-enter-group
-</details>
+```text
+设置自动拒绝等级 5
+设置自动批准等级 16
+启用入群等级限制
+```
 
-打开 nonebot2 项目根目录下的 `pyproject.toml` 文件, 在 `[tool.nonebot]` 部分追加写入
+这表示：等级不高于 5 时拒绝；等级至少 16 才继续答案匹配；其余情况转人工。达到批准等级仍须命中允许关键词。
 
-    plugins = ["nonebot_plugin_auto_enter_group"]
+## 命令
 
-</details>
+管理命令由当前群群主、管理员或超级用户使用，不需要 @ 机器人。命令前缀以真寻的 `COMMAND_START` 配置为准。
 
-## ⚙️ 配置
+| 命令 | 说明 |
+|---|---|
+| `查看关键词` | 查看当前群的允许、拒绝关键词 |
+| `添加允许关键词 词1,词2` | 添加一个或多个允许词，中英文逗号均可 |
+| `删除允许关键词 词` | 删除一个允许词 |
+| `添加拒绝关键词 词1,词2` | 添加一个或多个拒绝词 |
+| `删除拒绝关键词 词` | 删除一个拒绝词 |
+| `查看入群等级限制` | 查看开关和两项等级阈值 |
+| `启用入群等级限制` / `禁用入群等级限制` | 开关当前群等级审核 |
+| `设置自动拒绝等级 5` | 等级小于等于该值时拒绝 |
+| `设置自动批准等级 16` | 等级大于等于该值时才进入关键词审批 |
+| `查看入群拒绝理由` | 查看三类拒绝理由 |
+| `设置黑名单拒绝理由 内容` | 修改黑名单拒绝理由 |
+| `设置拒绝关键词理由 内容` | 修改拒绝关键词理由 |
+| `设置等级过低拒绝理由 内容` | 修改等级拒绝理由 |
+| `启用退群黑名单` / `禁用退群黑名单` | 开关当前群的退群记录及黑名单拒绝 |
+| `查看黑名单` | 不超过 60 人直接显示，超过 60 人发送 TXT 群文件 |
+| `查询黑名单 QQ号` | 查询一个或多个 QQ 号是否在当前群名单中 |
+| `添加黑名单 QQ号` / `移除黑名单 QQ号` | 批量增删，支持逗号、空格、换行分隔 |
+| `共享黑名单 群号` | 与指定群合并并共享黑名单 |
+| `同步黑名单 群号` | 一次性将指定群的已有名单添加到当前群 |
+| `停止共享黑名单 [群号]` | 当前群退出共享组，保留已有名单 |
 
-无配置项，涉及到群管需用命令进行配置
-插件数据存储在目录 ``~/.local/share/nonebot2/nonebot_plugin_auto_enter_group``
+拒绝理由会去除换行，最多 100 个字符。自动拒绝等级必须小于自动批准等级。
 
-## 🎉 使用
-### 指令表
-| 指令 | 权限 | 需要@ | 范围 | 说明 |
-|:-----:|:----:|:----:|:----:|:----:|
-| 查看关键词 | 群主/管理员/超级用户 | 否 | 群聊 | 群主/管理员可查看入群关键词 |
-| 添加/删除允许关键词 | 群主/管理员/超级用户 | 否 | 群聊 | <关键词> |
-| 添加/删除拒绝关键词 | 群主/管理员/超级用户 | 否 | 群聊 | <关键词> |
-| 启用/禁用退群黑名单 | 群主/管理员/超级用户 | 否 | 群聊 | 启用后退群用户将无法再次加入 |
-| 查看黑名单 | 群主/管理员/超级用户 | 否 | 群聊 | 查看当前群组黑名单 |
-| 添加/移除黑名单 | 群主/管理员/超级用户 | 否 | 群聊 | 将批量用户ID添加/移出黑名单 |
+## 审批规则
 
-## 🌹 鸣谢
+1. 邀请机器人入群的 `invite` 事件不处理；真寻相关开关禁止时停止处理。
+2. 退群黑名单开启且申请人命中时拒绝。
+3. 没有命中允许词、但命中拒绝词时拒绝。答案同时命中两者时，允许词优先。
+4. 等级限制开启时，先应用等级规则。等级隐藏、读取失败或不满足批准门槛时转人工。
+5. 未设置允许词、验证信息为空、或答案未命中允许词时转人工；其余符合条件的申请自动批准。
 
-感谢 [大橘](https://github.com/zhiyu1998) 提供的代码，多写点让我抄抄！  
-由于我不是代码相关专业，使用AI协助完成的代码
+空验证信息不会自动拒绝。如果协议端随后发送含完整答案的申请事件，插件会再次按规则处理；插件不会主动补拉答案。关键词优先级不会绕过黑名单和等级限制。
+
+## 黑名单共享与同步
+
+- 建立共享需要操作者拥有当前群及目标群的管理员权限，超级用户可使用特权。机器人需要能够查询目标群成员信息。
+- 共享建立后合并名单，退群记录和手动增删会传播到整个连通共享组；各群的启用开关仍分别管理。
+- 一次性同步只复制名单，不建立长期共享关系。当前实现只检查当前群命令权限，未检查操作者在来源群的管理员身份；只能读取当前机器人已经保存的来源群名单。
+- 当前群已共享时，一次性同步新增的条目不会立即传播到其他共享群。
+- 停止共享会让当前群退出整个共享组并保留名单；可选群号用于确认共享组，不表示只断开与该群的一条连接。
+- 退群或被踢事件仅在当前群退群黑名单开启时记录并通知，关闭时不发送退群提示。
+
+## 数据与迁移
+
+按群保存关键词、等级阈值、拒绝理由、黑名单和共享关系，使用 Localstore 管理的 `data.json`；TXT 临时文件使用插件缓存目录，发送后删除。
+
+实际数据和缓存位置由宿主的 `localstore_data_dir`、`localstore_cache_dir` 等配置决定。容器部署时，上传文件所用缓存路径需要能被 QQ 协议端访问。
+
+迁移前备份原 `data.json`，并核对新旧 Localstore 路径。保留模块名 `nonebot_plugin_auto_enter_group`。加载时会补齐新增字段，并兼容早期 `keywords` 和 `min_level` 字段；默认关闭等级限制及退群黑名单。
+
+## 测试
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
+
+测试使用真实 NoneBot、OneBot 适配器与临时 Localstore 目录，真寻数据库接口由测试替身提供，不连接运行中的机器人。真实宿主、协议端等级字段及群文件上传仍需在对应部署环境验证。
+
+## 来源与许可
+
+原项目：[padoru233/nonebot-plugin-auto-enter-group](https://github.com/padoru233/nonebot-plugin-auto-enter-group)。感谢原作者及原项目提到的[大橘](https://github.com/zhiyu1998)。
+
+使用 [MIT License](LICENSE)，保留原作者的版权及许可声明。

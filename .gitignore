@@ -123,6 +123,8 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -174,3 +176,15 @@ pyrightconfig.json
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+
+# Runtime state and local credentials
+data/
+cache/
+log/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.pem
+*.key

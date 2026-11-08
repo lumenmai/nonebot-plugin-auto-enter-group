@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest>=8,<9
+pytest-asyncio>=0.25,<0.26
+pytest-mock>=3.14,<4
